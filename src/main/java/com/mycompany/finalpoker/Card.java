@@ -4,11 +4,13 @@
  */
 package com.mycompany.finalpoker;
 
+import java.io.Serializable;
+
 /**
  *
  * @author nickbenoit
  */
-public class Card {
+public class Card implements Serializable {
     private String suit;
     private int value;
     private String strVal;

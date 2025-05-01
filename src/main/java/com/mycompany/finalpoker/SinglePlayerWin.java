@@ -228,6 +228,7 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
 
     private void checkBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBtnActionPerformed
         // TODO add your handling code here:
+        
     }//GEN-LAST:event_checkBtnActionPerformed
 
     private void raiseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_raiseButtonActionPerformed
@@ -253,15 +254,16 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
     
     @Override
     public void updateData(){
-        if(server.getCurrentState().getValue() == 0){
-            showInitialCards();
-        }else if(server.getCurrentState().getValue() == 1){
-            showFlopCards();
-        }else if(server.getCurrentState().getValue() == 2){
-            showTurnCard();
-        }else{
-            showRiverCard();
-        }
+//        if(server.getCurrentState().getValue() == 0){
+//            showInitialCards();
+//        }else if(server.getCurrentState().getValue() == 1){
+//            showFlopCards();
+//        }else if(server.getCurrentState().getValue() == 2){
+//            showTurnCard();
+//        }else{
+//            showRiverCard();
+//        }
+        showInitialCards();
     }
     
     private void initializeGui(){
@@ -278,6 +280,13 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
         raiseAmount.setText("$ " + raiseSlider.getValue());
     }
     
+    public void disableButton(){
+        raiseButton.setVisible(false);
+    }
+    public void disableSlider(){
+        raiseSlider.setVisible(false);
+    }
+    
     private void updateBalanceText(){
         balanceText.setText("Balance: " + Player.getPlayer().getBalance());
     }
@@ -286,7 +295,7 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
         for(int i = 0; i<playerCardsImg.size(); i++){
             try{
                 ImageIcon tmp = new javax.swing.ImageIcon(
-                new java.net.URL("https://deckofcardsapi.com/static/img/" + (server.getPlayerCards().get(i)) + ".png"));
+                new java.net.URL("https://deckofcardsapi.com/static/img/" + (Player.getPlayer().getPlayerCards().get(i)) + ".png"));
                  // resizing from https://stackoverflow.com/a/18335435	
                  Image image = tmp.getImage(); // transform it 
                  Image newimg = image.getScaledInstance(50, 70,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  

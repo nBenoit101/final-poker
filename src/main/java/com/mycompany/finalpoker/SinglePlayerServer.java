@@ -6,6 +6,7 @@ package com.mycompany.finalpoker;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -23,6 +24,7 @@ public class SinglePlayerServer {
     private Socket client;
     private PrintWriter out;
     private BufferedReader in;
+    private ObjectOutputStream objectOut;
     
     //Observer fields
     private ArrayList<Observer> observers;
@@ -42,8 +44,7 @@ public class SinglePlayerServer {
             return value;
         }
     }
-    
-//  private int currentGameState 
+
     private enum ButtonPos{DEALER, PLAYER}
     private GameState currentState;
     private ButtonPos currentButton;
@@ -64,7 +65,7 @@ public class SinglePlayerServer {
         dealerBalance = 0;
         observers = new ArrayList();
         currentState = GameState.DEAL;
-        currentButton = ButtonPos.PLAYER;
+        currentButton = ButtonPos.DEALER;
         handleGameServer();
         
     }
@@ -110,16 +111,29 @@ public class SinglePlayerServer {
                 client = socket.accept();
                 out = new PrintWriter(client.getOutputStream(),true);
                 in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                objectOut = new ObjectOutputStream(client.getOutputStream());
                 System.out.println("[Server] Client Connected Succesfully");
                 try{
                     while(true){
                         String request = in.readLine();
-                        if(request.equals("deal")){
+                        if(request.equals("dealState")){
                             newRound();
                             handleGame(request);
+                            objectOut.writeObject(playerCards);
+                            objectOut.flush();
+                            System.out.println(currentButton);
                             System.out.println("[Server has dealt the cards]");
-                        }else{
+                           
+                        }else if(request.equals("initalCardsRecieved")){
+//                            if(buttonPosToSend().equals("dealers turn")){
+//                                out.println("players turn");
 //                            
+//                            }else{
+//                                out.println("dealers turn");
+//                            }
+                            out.println("dealersTurn");
+                        }else{
+                        
                         }
                     }
                 }catch(Exception e){
@@ -134,18 +148,25 @@ public class SinglePlayerServer {
         
     }
     
-    private void notifyObserver(){
-        for(int i = 0; i< observers.size(); i++){
-                observers.get(i).updateData();
-            }
+    private String dealersChoice(){
+       //can return check 
+       //call
+       //raise
+        return "Dealer calls";
     }
     
     private void handleGame(String action){
         if(action.equals("deal")){
-            notifyObserver();
             System.out.println(dealerCards);
             System.out.println(playerCards);
         }
+    }
+    
+    private String buttonPosToSend(){
+        if(currentButton == ButtonPos.DEALER){
+            return "players turn";
+        }
+        return "dealers turn";
     }
     
     private void dealCards(){

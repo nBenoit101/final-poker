@@ -24,7 +24,7 @@ public class HomeScreen extends javax.swing.JFrame {
         initComponents();
         setUpWin();
         window = SinglePlayerWin.getWindow();
-        SinglePlayerServer.server().addObservers(window);
+        p.addObservers(window);
         window.setVisible(false);
     }
     
