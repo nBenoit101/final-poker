@@ -31,22 +31,24 @@ public class SinglePlayerServer {
     
     
     //Game Fields 
-    public enum GameState{
-        DEAL(0),
-        FLOP(1),
-        TURN(2),
-        RIVER(3);
-        private final int value;
-        private GameState(int value){
-            this.value = value;
-        }
-        public int getValue(){
-            return value;
-        }
-    }
+//    public enum GameState{
+//        DEAL(0),
+//        FLOP(1),
+//        TURN(2),
+//        RIVER(3);
+//        private final int value;
+//        private GameState(int value){
+//            this.value = value;
+//        }
+//        public int getValue(){
+//            return value;
+//        }
+//    }
+    private enum GameState{DEAL,DEALDECISIONS,FLOP,TURN,RIVER}
 
     private enum ButtonPos{DEALER, PLAYER}
     private GameState currentState;
+    private GameState nextState;
     private ButtonPos currentButton;
     private Deck deck;
     private ArrayList<Card> dealerCards;
@@ -65,8 +67,11 @@ public class SinglePlayerServer {
         dealerBalance = 0;
         observers = new ArrayList();
         currentState = GameState.DEAL;
-        currentButton = ButtonPos.DEALER;
+        nextState = GameState.DEAL;
+        currentButton = ButtonPos.PLAYER;
+        newRound();
         handleGameServer();
+        
         
     }
    
@@ -79,10 +84,10 @@ public class SinglePlayerServer {
         
     }
    
-   //Add Observers to server
-   public void addObservers(Observer o){
-       observers.add(o);
-   }
+//   //Add Observers to server
+//   public void addObservers(Observer o){
+//       observers.add(o);
+//   }
    
    public ArrayList<Card> getDealerCards(){
        return dealerCards;
@@ -109,32 +114,45 @@ public class SinglePlayerServer {
                 socket = new ServerSocket(port);
                 System.out.println("[Server] Waiting on Client Connection.....");
                 client = socket.accept();
+                objectOut = new ObjectOutputStream(client.getOutputStream());
                 out = new PrintWriter(client.getOutputStream(),true);
                 in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                objectOut = new ObjectOutputStream(client.getOutputStream());
+                
                 System.out.println("[Server] Client Connected Succesfully");
                 try{
                     while(true){
-                        String request = in.readLine();
-                        if(request.equals("dealState")){
-                            newRound();
-                            handleGame(request);
-                            objectOut.writeObject(playerCards);
-                            objectOut.flush();
-                            System.out.println(currentButton);
-                            System.out.println("[Server has dealt the cards]");
-                           
-                        }else if(request.equals("initalCardsRecieved")){
-//                            if(buttonPosToSend().equals("dealers turn")){
-//                                out.println("players turn");
-//                            
-//                            }else{
-//                                out.println("dealers turn");
-//                            }
-                            out.println("dealersTurn");
-                        }else{
-                        
+//                        String request = in.readLine();
+                        if(currentState == GameState.DEAL){
+                            String request = in.readLine();
+                            if(request.equals("dealState")){
+                                objectOut.writeObject(playerCards);
+                                objectOut.flush();
+                                System.out.println(currentButton);
+                                System.out.println("[Server has dealt the cards]");
+                                nextState = GameState.DEALDECISIONS;
+                            }
+
                         }
+                        if(currentState == GameState.DEALDECISIONS){
+                            String request = in.readLine();
+                            if(request.equals("initalCardsRecieved")){
+                                if(buttonPosToSend().equals("dealersTurn")){
+                                    out.println(dealersChoice());
+                                }else{
+                                    out.println(buttonPosToSend());
+                                }
+                            }
+             
+                            if(request.equals("check")){
+                                System.out.println("[Server]Recieved Check");
+                                out.println("hi");
+                                System.out.println("[Server]sent");
+                                
+                            }
+                        }
+                        
+                        
+                        currentState = nextState;
                     }
                 }catch(Exception e){
                 
@@ -148,13 +166,7 @@ public class SinglePlayerServer {
         
     }
     
-    private String dealersChoice(){
-       //can return check 
-       //call
-       //raise
-        return "Dealer calls";
-    }
-    
+
     private void handleGame(String action){
         if(action.equals("deal")){
             System.out.println(dealerCards);
@@ -162,11 +174,19 @@ public class SinglePlayerServer {
         }
     }
     
+    private String dealersChoice(){
+       //can return check 
+       //call
+       //raise
+        return "check";
+    }
+    
+    
     private String buttonPosToSend(){
         if(currentButton == ButtonPos.DEALER){
-            return "players turn";
+            return "playersTurn";
         }
-        return "dealers turn";
+        return "dealersTurn";
     }
     
     private void dealCards(){

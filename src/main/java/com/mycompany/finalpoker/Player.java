@@ -19,8 +19,10 @@ public class Player {
     private String name;
     private int balance;
     
-    private enum GameState{DEAL, DEALDECISIONS};
+    private enum GameState{DEAL, DEALDECISIONS, FLOP};
     private GameState currentState = GameState.DEAL;
+    private GameState nextState = GameState.DEAL;
+    private boolean hasPlayerGone;
     
     //game fields
     private ArrayList<Card> playerCards;
@@ -44,6 +46,7 @@ public class Player {
         this.name = name;
         this.balance = 100;
         this.observer = new ArrayList();
+        this.hasPlayerGone = false;
         this.ip = "localhost";
         this.port = 1234;
         this.messageToSend = "dealState";
@@ -74,35 +77,55 @@ public class Player {
                     while(true){
                         if(messageToSend.equals("quit")){
                             break;
-                        }else if(messageToSend.equals("dealState")){
-                           out.println(messageToSend);
-                           messageToSend = "donothing";
-                        }else{
-                            out.println("donothing");
                         }
-                        
+
                         if (currentState == GameState.DEAL) {
+                            out.println("dealState"); 
                             try {
-                                playerCards = (ArrayList<Card>) objectIn.readObject();
+                                playerCards = (ArrayList<Card>) objectIn.readObject(); 
                                 System.out.println("[Player] Received cards: " + playerCards);
-                                notifyObserver(); // Don't forget this
-//                                currentState = GameState.DEALDECISIONS;
-                                out.println("initalCardsRecieved");
+                                SinglePlayerWin.getWindow().showInitialCards();
+                                out.println("initalCardsRecieved"); 
+                                nextState = GameState.DEALDECISIONS;
+
                             } catch (Exception e) {
-                                
+                                e.printStackTrace();
+                                messageToSend = "donothing";
                             }
                         }
-                        
+
                         if(currentState == GameState.DEALDECISIONS){
                             String serverMessage = in.readLine();
                             if(serverMessage.equals("playersTurn")){
-                                SinglePlayerWin.getWindow().disableButton();
+                                SinglePlayerWin.getWindow().changeDealersChoice(serverMessage);
+                                SinglePlayerWin.getWindow().handleGui("check");
+                                
+                                
                             }else{
-                              SinglePlayerWin.getWindow().disableSlider();  
+                              SinglePlayerWin.getWindow().changeDealersChoice(serverMessage);
+                              SinglePlayerWin.getWindow().handleGui(serverMessage);
                             }
+                            
+                            if(serverMessage.equals("check")){
+                                System.out.println("[CLient]Recieved check");
+                                SinglePlayerWin.getWindow().changeDealersChoice(serverMessage);
+//                                if(hasPlayerGone){
+//                                    SinglePlayerWin.getWindow().changeDealersChoice(serverMessage);
+//                                }
+                            }
+                            if(serverMessage.equals("hi")){
+                               System.out.println("[CLient]Recieved hi"); 
+                            }
+                            out.println(messageToSend);
                             messageToSend = "donothing";
+                            
+                            
+                            
                         }
-                        currentState = GameState.DEALDECISIONS;
+                                           
+                        currentState = nextState; 
+
+
 
                     }
 
@@ -120,6 +143,10 @@ public class Player {
     public void addObservers(Observer o){
        observer.add(o);
    }
+    
+    public void changeHasPlayerGone(boolean b){
+        hasPlayerGone = b;
+    }
     
     private void notifyObserver(){
         for(int i = 0; i< observer.size(); i++){

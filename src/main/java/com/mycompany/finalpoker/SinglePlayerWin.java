@@ -32,6 +32,7 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
         playerCardsImg = new ArrayList();
         tableCardsImg = new ArrayList();
         initializeGui();
+        disableGui();
         cardState(false);
     }
 
@@ -47,7 +48,7 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
         callBtn = new javax.swing.JButton();
         checkBtn = new javax.swing.JButton();
         raiseSlider = new javax.swing.JSlider();
-        raiseButton = new javax.swing.JButton();
+        raiseBtn = new javax.swing.JButton();
         raiseAmount = new javax.swing.JLabel();
         turnCard = new javax.swing.JLabel();
         flopCard3 = new javax.swing.JLabel();
@@ -87,10 +88,10 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
             }
         });
 
-        raiseButton.setText("Raise");
-        raiseButton.addActionListener(new java.awt.event.ActionListener() {
+        raiseBtn.setText("Raise");
+        raiseBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                raiseButtonActionPerformed(evt);
+                raiseBtnActionPerformed(evt);
             }
         });
 
@@ -169,7 +170,7 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
                         .addGap(26, 26, 26)
                         .addComponent(raiseAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(66, 66, 66)
-                        .addComponent(raiseButton))
+                        .addComponent(raiseBtn))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(294, 294, 294)
                         .addComponent(playerCard1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -215,7 +216,7 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
                         .addGap(24, 24, 24))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(raiseButton)
+                        .addComponent(raiseBtn)
                         .addGap(14, 14, 14))))
         );
 
@@ -229,11 +230,15 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
     private void checkBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBtnActionPerformed
         // TODO add your handling code here:
         
+        Player.getPlayer().changeHasPlayerGone(true);
+        Player.getPlayer().playerActions("check");
+        System.out.println("[Window]Check");
+        disableGui();
     }//GEN-LAST:event_checkBtnActionPerformed
 
-    private void raiseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_raiseButtonActionPerformed
+    private void raiseBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_raiseBtnActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_raiseButtonActionPerformed
+    }//GEN-LAST:event_raiseBtnActionPerformed
 
     private void balanceTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_balanceTextActionPerformed
         // TODO add your handling code here:
@@ -266,6 +271,10 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
         showInitialCards();
     }
     
+    public void changeDealersChoice(String t){
+        dealerInfo.setText(t);
+    }
+    
     private void initializeGui(){
         playerCardsImg.add(playerCard1);
         playerCardsImg.add(playerCard2);
@@ -281,7 +290,7 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
     }
     
     public void disableButton(){
-        raiseButton.setVisible(false);
+        raiseBtn.setVisible(false);
     }
     public void disableSlider(){
         raiseSlider.setVisible(false);
@@ -291,7 +300,7 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
         balanceText.setText("Balance: " + Player.getPlayer().getBalance());
     }
     
-    private void showInitialCards(){
+    public void showInitialCards(){
         for(int i = 0; i<playerCardsImg.size(); i++){
             try{
                 ImageIcon tmp = new javax.swing.ImageIcon(
@@ -324,7 +333,7 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
         }        
     }
     
-    private void showFlopCards(){
+    public void showFlopCards(){
        for(int i = 0; i<3; i++){
             try{
                 ImageIcon tmp = new javax.swing.ImageIcon(
@@ -342,7 +351,7 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
         }
     }
         
-    private void showTurnCard(){
+    public void showTurnCard(){
         try{
             ImageIcon tmp = new javax.swing.ImageIcon(
                 new java.net.URL("https://deckofcardsapi.com/static/img/" + (server.getTableCards().get(3)) + ".png"));
@@ -358,7 +367,7 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
         }
     }
     
-    private void showRiverCard(){
+    public void showRiverCard(){
         try{
             ImageIcon tmp = new javax.swing.ImageIcon(
                 new java.net.URL("https://deckofcardsapi.com/static/img/" + (server.getTableCards().get(2)) + ".png"));
@@ -373,6 +382,30 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
 
         }
     }
+    
+    public void handleGui(String message){
+        if (message.equals("check")){
+            checkBtn.setEnabled(true);
+            raiseSlider.setEnabled(true);
+            raiseAmount.setEnabled(true);
+            raiseBtn.setEnabled(true);
+        }
+        if(message.equals("raise")){
+            callBtn.setEnabled(true);
+            raiseBtn.setEnabled(true);
+            raiseSlider.setEnabled(true);
+            raiseAmount.setEnabled(true);
+        }
+    }
+    
+    public void disableGui(){
+        checkBtn.setEnabled(false);
+        raiseSlider.setEnabled(false);
+        raiseAmount.setEnabled(false);
+        raiseBtn.setEnabled(false);
+        callBtn.setEnabled(false);
+    }
+    
     
     private void cardState(boolean b){
         for(int i=0; i<2; i++){
@@ -400,7 +433,7 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
     private javax.swing.JLabel playerCard1;
     private javax.swing.JLabel playerCard2;
     private javax.swing.JLabel raiseAmount;
-    private javax.swing.JButton raiseButton;
+    private javax.swing.JButton raiseBtn;
     private javax.swing.JSlider raiseSlider;
     private javax.swing.JLabel riverCard;
     private javax.swing.JLabel turnCard;
