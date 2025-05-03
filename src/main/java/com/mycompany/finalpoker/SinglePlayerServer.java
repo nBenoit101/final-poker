@@ -57,7 +57,7 @@ public class SinglePlayerServer {
         nextState = GameState.DEAL;
         currentButton = ButtonPos.PLAYER;
         hasDealerGone = false;
-        newRound();
+//        newRound();
         handleGameServer();
         
         
@@ -94,8 +94,7 @@ public class SinglePlayerServer {
    }
    
    //private Methods 
-    private void handleGameServer(){
-            
+    private void handleGameServer(){          
         new Thread() {
            public void run() {
             try{
@@ -104,15 +103,15 @@ public class SinglePlayerServer {
                 client = socket.accept();
                 objectOut = new ObjectOutputStream(client.getOutputStream());
                 out = new PrintWriter(client.getOutputStream(),true);
-                in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                
+                in = new BufferedReader(new InputStreamReader(client.getInputStream()));                
                 System.out.println("[Server] Client Connected Succesfully");
                 try{
                     while(true){
-//                        String request = in.readLine();
                         if(currentState == GameState.DEAL){
                             String request = in.readLine();
                             if(request.equals("dealState")){
+                                newRound();
+                                dealCards();
                                 objectOut.writeObject(playerCards);
                                 objectOut.flush();
                                 System.out.println(currentButton);
@@ -123,36 +122,45 @@ public class SinglePlayerServer {
                         }
                         if(currentState == GameState.DEALDECISIONS){
                             String request = in.readLine();
-                            if(request.equals("initalCardsRecieved")){
+                            if(request.equals("cardsRecieved")){
                                 if(buttonPosToSend().equals("dealersTurn")){
                                     out.println(dealersChoice());
-//                                    hasDealerGone = true;
+                                    hasDealerGone = true;
                                 }else{
                                     out.println(buttonPosToSend());
                                 }
                             }
                             if(request.equals("check")){
                                 System.out.println("[Server]Recieved Check");
-//                                out.println("check");
-//                                System.out.println("[Server]sent");
-//                                if(buttonPosToSend().equals("dealersTurn")){
-//                                    nextState = GameState.FLOP;
-//                                    out.println();
-//                                }else{
-//                                    
-//                                }
                                 if(buttonPosToSend().equals("dealersTurn")){
+//                                    hasDealerGone = true;
                                     nextState = GameState.FLOP;
                                     out.println("nextState");
                                     System.out.println("[Srver]next state sent");
                                           
                                 }else{
-                                    out.println(dealersChoice());
+                                    out.println("nextState");
+                                    nextState = GameState.FLOP;
                                     
                                 }
                             }
                             if(request.equals("donothing")){
                                 out.println("doNothing");
+                            }
+                        }
+                        if(currentState == GameState.FLOP ||currentState == GameState.TURN || currentState ==  GameState.RIVER ){
+                            if(currentState == GameState.FLOP){
+                                String request = in.readLine();
+                                if(request.equals("flopState")){
+                                    dealCards();
+                                    System.out.println("[Server]Recieved Flop State");
+                                    objectOut.writeObject(tableCards);
+                                    objectOut.flush();
+                                    System.out.println(currentButton);
+                                    System.out.println("[Server has dealt the cards]");
+                                    nextState = GameState.DEALDECISIONS;
+                                    
+                                }
                             }
                         }
                         
@@ -229,7 +237,7 @@ public class SinglePlayerServer {
         pot = 0;
         playerBet = 0;
         dealerBet = 0;
-        dealCards();
+//        dealCards();
         if(currentButton == ButtonPos.PLAYER){
             currentButton = ButtonPos.DEALER;
         }else{

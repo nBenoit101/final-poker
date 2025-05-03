@@ -19,7 +19,7 @@ public class Player {
     private String name;
     private int balance;
     
-    private enum GameState{DEAL, DEALDECISIONS, FLOP};
+    private enum GameState{DEAL, DEALDECISIONS, FLOP, TURN, RIVER};
     private GameState currentState = GameState.DEAL;
     private GameState nextState = GameState.DEAL;
     private boolean hasPlayerGone;
@@ -27,6 +27,7 @@ public class Player {
     //game fields
     private ArrayList<Card> playerCards;
     private ArrayList<Card> dealerCards;
+    private ArrayList<Card> tableCards;
     
     //Player networking fields
     private String ip;
@@ -85,17 +86,17 @@ public class Player {
                                 playerCards = (ArrayList<Card>) objectIn.readObject(); 
                                 System.out.println("[Player] Received cards: " + playerCards);
                                 SinglePlayerWin.getWindow().showInitialCards();
-                                out.println("initalCardsRecieved"); 
+                                out.println("cardsRecieved"); 
                                 System.out.println("[Client] sent out initail state");
-                                nextState = GameState.DEALDECISIONS;
+                                currentState = GameState.DEALDECISIONS;
+                                nextState = GameState.FLOP;
 
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 messageToSend = "donothing";
                                 System.out.println("[Client] did not reciee cards");
                             }
-                        }
-                        if(currentState == GameState.DEALDECISIONS){
+                        }else if(currentState == GameState.DEALDECISIONS){
                             String serverMessage = in.readLine();
                             if(serverMessage.equals("playersTurn")){
                                 SinglePlayerWin.getWindow().changeDealersChoice(serverMessage);
@@ -106,22 +107,34 @@ public class Player {
                                 SinglePlayerWin.getWindow().changeDealersChoice(serverMessage);
                                     if(hasPlayerGone){
                                         SinglePlayerWin.getWindow().changeDealersChoice(serverMessage);
-//                                        nextState = GameState.FLOP;
-//                                        messageToSend = "nextState";
-//                                        System.out.println("[Client]Next state sent");
                                     }else{
                                         SinglePlayerWin.getWindow().changeDealersChoice(serverMessage);
                                         SinglePlayerWin.getWindow().handleGui("check");
                                     }
                             }
                             if(serverMessage.equals("nextState")){
-//                                nextState = GameState.FLOP;
+                                currentState = nextState;
                                 System.out.println("[Client]Recieved next state");
                             }
-                            out.println(messageToSend);
+                            out.println(messageToSend); 
+                            
+                        }else if (currentState == GameState.FLOP){
+                            out.println("flopState");
+                            try {
+                                tableCards = (ArrayList<Card>) objectIn.readObject(); 
+                                System.out.println("[Player] Received cards: " + tableCards);
+                                SinglePlayerWin.getWindow().showFlopCards();
+                                out.println("cardsRecieved"); 
+                                System.out.println("[Client] sent out flop state");
+                                currentState = GameState.DEALDECISIONS;
+                                nextState = GameState.TURN;
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                messageToSend = "donothing";
+                                System.out.println("[Client] did not reciee cards");
+                            }
                         }
                         messageToSend = "donothing";   
-                        currentState = nextState; 
                     }
 
                 }catch(Exception e){
@@ -143,11 +156,23 @@ public class Player {
         hasPlayerGone = b;
     }
     
-    private void notifyObserver(){
-        for(int i = 0; i< observer.size(); i++){
-                observer.get(i).updateData();
-            }
-    }
+//    private void notifyObserver(){
+//        for(int i = 0; i< observer.size(); i++){
+//                observer.get(i).updateData();
+//            }
+//    }
+//    
+//    private GameState nextState(){
+//        if(currentState == GameState.DEAL){
+//            return GameState.FLOP;
+//        }else if(currentState == GameState.FLOP){
+//            return GameState.TURN;
+//        }else if (currentState == GameState.TURN){
+//            return GameState.RIVER;
+//        }else{
+//            return GameState.DEAL;
+//        }
+//    }
     
     //Player Methods 
     public String getName(){
@@ -160,6 +185,10 @@ public class Player {
     
     public ArrayList<Card> getPlayerCards(){
         return playerCards;
+    }
+    
+    public ArrayList<Card> getFlopCards(){
+        return tableCards;
     }
     
     public boolean changeBalance(int amount){

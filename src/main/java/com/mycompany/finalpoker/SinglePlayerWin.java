@@ -337,7 +337,7 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
        for(int i = 0; i<3; i++){
             try{
                 ImageIcon tmp = new javax.swing.ImageIcon(
-                new java.net.URL("https://deckofcardsapi.com/static/img/" + (server.getTableCards().get(i)) + ".png"));
+                new java.net.URL("https://deckofcardsapi.com/static/img/" + (Player.getPlayer().getFlopCards().get(i)) + ".png"));
                  // resizing from https://stackoverflow.com/a/18335435	
                  Image image = tmp.getImage(); // transform it 
                  Image newimg = image.getScaledInstance(50, 70,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
