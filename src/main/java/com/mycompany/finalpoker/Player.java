@@ -78,59 +78,54 @@ public class Player {
                         if(messageToSend.equals("quit")){
                             break;
                         }
-
                         if (currentState == GameState.DEAL) {
                             out.println("dealState"); 
+                            System.out.println("[Client] sent out deal state");
                             try {
                                 playerCards = (ArrayList<Card>) objectIn.readObject(); 
                                 System.out.println("[Player] Received cards: " + playerCards);
                                 SinglePlayerWin.getWindow().showInitialCards();
                                 out.println("initalCardsRecieved"); 
+                                System.out.println("[Client] sent out initail state");
                                 nextState = GameState.DEALDECISIONS;
 
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 messageToSend = "donothing";
+                                System.out.println("[Client] did not reciee cards");
                             }
                         }
-
                         if(currentState == GameState.DEALDECISIONS){
                             String serverMessage = in.readLine();
                             if(serverMessage.equals("playersTurn")){
                                 SinglePlayerWin.getWindow().changeDealersChoice(serverMessage);
                                 SinglePlayerWin.getWindow().handleGui("check");
-                                
-                                
-                            }else{
-                              SinglePlayerWin.getWindow().changeDealersChoice(serverMessage);
-                              SinglePlayerWin.getWindow().handleGui(serverMessage);
                             }
-                            
                             if(serverMessage.equals("check")){
-                                System.out.println("[CLient]Recieved check");
+                                System.out.println("[Client]Recieved check");
                                 SinglePlayerWin.getWindow().changeDealersChoice(serverMessage);
-//                                if(hasPlayerGone){
-//                                    SinglePlayerWin.getWindow().changeDealersChoice(serverMessage);
-//                                }
+                                    if(hasPlayerGone){
+                                        SinglePlayerWin.getWindow().changeDealersChoice(serverMessage);
+//                                        nextState = GameState.FLOP;
+//                                        messageToSend = "nextState";
+//                                        System.out.println("[Client]Next state sent");
+                                    }else{
+                                        SinglePlayerWin.getWindow().changeDealersChoice(serverMessage);
+                                        SinglePlayerWin.getWindow().handleGui("check");
+                                    }
                             }
-                            if(serverMessage.equals("hi")){
-                               System.out.println("[CLient]Recieved hi"); 
+                            if(serverMessage.equals("nextState")){
+//                                nextState = GameState.FLOP;
+                                System.out.println("[Client]Recieved next state");
                             }
                             out.println(messageToSend);
-                            messageToSend = "donothing";
-                            
-                            
-                            
                         }
-                                           
+                        messageToSend = "donothing";   
                         currentState = nextState; 
-
-
-
                     }
 
                 }catch(Exception e){
-            
+                    e.printStackTrace();
                 }
             }
         }.start();

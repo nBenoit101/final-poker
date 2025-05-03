@@ -272,7 +272,7 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
     }
     
     public void changeDealersChoice(String t){
-        dealerInfo.setText(t);
+        dealerInfo.setText("Dealer chooses to "+t);
     }
     
     private void initializeGui(){

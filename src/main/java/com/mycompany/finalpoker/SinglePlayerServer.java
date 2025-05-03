@@ -30,20 +30,6 @@ public class SinglePlayerServer {
     private ArrayList<Observer> observers;
     
     
-    //Game Fields 
-//    public enum GameState{
-//        DEAL(0),
-//        FLOP(1),
-//        TURN(2),
-//        RIVER(3);
-//        private final int value;
-//        private GameState(int value){
-//            this.value = value;
-//        }
-//        public int getValue(){
-//            return value;
-//        }
-//    }
     private enum GameState{DEAL,DEALDECISIONS,FLOP,TURN,RIVER}
 
     private enum ButtonPos{DEALER, PLAYER}
@@ -58,17 +44,19 @@ public class SinglePlayerServer {
     private int playerBet;
     private int dealerBet;
     private int dealerBalance;
+    private boolean hasDealerGone;
     
     
     private static SinglePlayerServer server;
     
     private SinglePlayerServer(){
         port = 1234;
-        dealerBalance = 0;
+        dealerBalance = 100;
         observers = new ArrayList();
         currentState = GameState.DEAL;
         nextState = GameState.DEAL;
         currentButton = ButtonPos.PLAYER;
+        hasDealerGone = false;
         newRound();
         handleGameServer();
         
@@ -138,16 +126,33 @@ public class SinglePlayerServer {
                             if(request.equals("initalCardsRecieved")){
                                 if(buttonPosToSend().equals("dealersTurn")){
                                     out.println(dealersChoice());
+//                                    hasDealerGone = true;
                                 }else{
                                     out.println(buttonPosToSend());
                                 }
                             }
-             
                             if(request.equals("check")){
                                 System.out.println("[Server]Recieved Check");
-                                out.println("hi");
-                                System.out.println("[Server]sent");
-                                
+//                                out.println("check");
+//                                System.out.println("[Server]sent");
+//                                if(buttonPosToSend().equals("dealersTurn")){
+//                                    nextState = GameState.FLOP;
+//                                    out.println();
+//                                }else{
+//                                    
+//                                }
+                                if(buttonPosToSend().equals("dealersTurn")){
+                                    nextState = GameState.FLOP;
+                                    out.println("nextState");
+                                    System.out.println("[Srver]next state sent");
+                                          
+                                }else{
+                                    out.println(dealersChoice());
+                                    
+                                }
+                            }
+                            if(request.equals("donothing")){
+                                out.println("doNothing");
                             }
                         }
                         
@@ -231,6 +236,7 @@ public class SinglePlayerServer {
             currentButton = ButtonPos.PLAYER;
         }
     }
+    
     
     
 }
