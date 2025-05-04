@@ -337,7 +337,7 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
        for(int i = 0; i<3; i++){
             try{
                 ImageIcon tmp = new javax.swing.ImageIcon(
-                new java.net.URL("https://deckofcardsapi.com/static/img/" + (Player.getPlayer().getFlopCards().get(i)) + ".png"));
+                new java.net.URL("https://deckofcardsapi.com/static/img/" + (Player.getPlayer().getTableCards().get(i)) + ".png"));
                  // resizing from https://stackoverflow.com/a/18335435	
                  Image image = tmp.getImage(); // transform it 
                  Image newimg = image.getScaledInstance(50, 70,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
@@ -354,7 +354,7 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
     public void showTurnCard(){
         try{
             ImageIcon tmp = new javax.swing.ImageIcon(
-                new java.net.URL("https://deckofcardsapi.com/static/img/" + (server.getTableCards().get(3)) + ".png"));
+                new java.net.URL("https://deckofcardsapi.com/static/img/" + (Player.getPlayer().getTableCards().get(3)) + ".png"));
                  // resizing from https://stackoverflow.com/a/18335435	
                  Image image = tmp.getImage(); // transform it 
                  Image newimg = image.getScaledInstance(50, 70,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
@@ -370,14 +370,14 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
     public void showRiverCard(){
         try{
             ImageIcon tmp = new javax.swing.ImageIcon(
-                new java.net.URL("https://deckofcardsapi.com/static/img/" + (server.getTableCards().get(2)) + ".png"));
+                new java.net.URL("https://deckofcardsapi.com/static/img/" + (Player.getPlayer().getTableCards().get(4)) + ".png"));
                  // resizing from https://stackoverflow.com/a/18335435	
                  Image image = tmp.getImage(); // transform it 
                  Image newimg = image.getScaledInstance(50, 70,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
                  // end resizing from https://stackoverflow.com/a/18335435
 
-                 tableCardsImg.get(2).setIcon(new ImageIcon(newimg));
-                 tableCardsImg.get(2).setVisible(true);
+                 tableCardsImg.get(4).setIcon(new ImageIcon(newimg));
+                 tableCardsImg.get(4).setVisible(true);
         }catch(java.net.MalformedURLException e){
 
         }

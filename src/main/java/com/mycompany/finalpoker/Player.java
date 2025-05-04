@@ -118,21 +118,54 @@ public class Player {
                             }
                             out.println(messageToSend); 
                             
-                        }else if (currentState == GameState.FLOP){
-                            out.println("flopState");
-                            try {
-                                tableCards = (ArrayList<Card>) objectIn.readObject(); 
-                                System.out.println("[Player] Received cards: " + tableCards);
-                                SinglePlayerWin.getWindow().showFlopCards();
-                                out.println("cardsRecieved"); 
-                                System.out.println("[Client] sent out flop state");
-                                currentState = GameState.DEALDECISIONS;
-                                nextState = GameState.TURN;
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                messageToSend = "donothing";
-                                System.out.println("[Client] did not reciee cards");
+                        }else{
+                            if (currentState == GameState.FLOP){
+                                out.println("flopState");
+                                try {
+                                    tableCards = (ArrayList<Card>) objectIn.readObject(); 
+                                    System.out.println("[Player] Received Flop cards: " + tableCards);
+                                    SinglePlayerWin.getWindow().showFlopCards();
+                                    out.println("cardsRecieved"); 
+                                    System.out.println("[Client] sent out flop state");
+                                    currentState = GameState.DEALDECISIONS;
+                                    nextState = GameState.TURN;
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    messageToSend = "donothing";
+                                    System.out.println("[Client] did not reciee cards");
+                                }
+                            }else if(currentState == GameState.TURN){
+                                out.println("turnState");
+                                try {
+                                    tableCards = (ArrayList<Card>) objectIn.readObject(); 
+                                    System.out.println("[Player] Received turn cards: " + tableCards);
+                                    SinglePlayerWin.getWindow().showTurnCard();
+                                    out.println("cardsRecieved"); 
+                                    System.out.println("[Client] sent out turn state");
+                                    currentState = GameState.DEALDECISIONS;
+                                    nextState = GameState.RIVER;
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    messageToSend = "donothing";
+                                    System.out.println("[Client] did not reciee cards");
+                                }
+                            }else{
+                                out.println("riverState");
+                                try {
+                                    tableCards = (ArrayList<Card>) objectIn.readObject(); 
+                                    System.out.println("[Player] Received River cards: " + tableCards);
+                                    SinglePlayerWin.getWindow().showRiverCard();
+                                    out.println("cardsRecieved"); 
+                                    System.out.println("[Client] sent out river state");
+                                    currentState = GameState.DEALDECISIONS;
+                                    nextState = GameState.DEAL;
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    messageToSend = "donothing";
+                                    System.out.println("[Client] did not reciee cards");
+                                }
                             }
+                            
                         }
                         messageToSend = "donothing";   
                     }
@@ -156,24 +189,6 @@ public class Player {
         hasPlayerGone = b;
     }
     
-//    private void notifyObserver(){
-//        for(int i = 0; i< observer.size(); i++){
-//                observer.get(i).updateData();
-//            }
-//    }
-//    
-//    private GameState nextState(){
-//        if(currentState == GameState.DEAL){
-//            return GameState.FLOP;
-//        }else if(currentState == GameState.FLOP){
-//            return GameState.TURN;
-//        }else if (currentState == GameState.TURN){
-//            return GameState.RIVER;
-//        }else{
-//            return GameState.DEAL;
-//        }
-//    }
-    
     //Player Methods 
     public String getName(){
         return name;
@@ -187,7 +202,7 @@ public class Player {
         return playerCards;
     }
     
-    public ArrayList<Card> getFlopCards(){
+    public ArrayList<Card> getTableCards(){
         return tableCards;
     }
     

@@ -116,11 +116,11 @@ public class SinglePlayerServer {
                                 objectOut.flush();
                                 System.out.println(currentButton);
                                 System.out.println("[Server has dealt the cards]");
-                                nextState = GameState.DEALDECISIONS;
+                                currentState = GameState.DEALDECISIONS;
+                                nextState = GameState.FLOP;
                             }
 
-                        }
-                        if(currentState == GameState.DEALDECISIONS){
+                        }else if(currentState == GameState.DEALDECISIONS){
                             String request = in.readLine();
                             if(request.equals("cardsRecieved")){
                                 if(buttonPosToSend().equals("dealersTurn")){
@@ -134,38 +134,68 @@ public class SinglePlayerServer {
                                 System.out.println("[Server]Recieved Check");
                                 if(buttonPosToSend().equals("dealersTurn")){
 //                                    hasDealerGone = true;
-                                    nextState = GameState.FLOP;
+                                    currentState = nextState;
                                     out.println("nextState");
                                     System.out.println("[Srver]next state sent");
                                           
                                 }else{
                                     out.println("nextState");
-                                    nextState = GameState.FLOP;
+                                    currentState = nextState;
                                     
                                 }
                             }
                             if(request.equals("donothing")){
                                 out.println("doNothing");
                             }
-                        }
-                        if(currentState == GameState.FLOP ||currentState == GameState.TURN || currentState ==  GameState.RIVER ){
+                        }else{
+//                            if(currentState == GameState.FLOP ||currentState == GameState.TURN || currentState ==  GameState.RIVER )
                             if(currentState == GameState.FLOP){
                                 String request = in.readLine();
                                 if(request.equals("flopState")){
                                     dealCards();
                                     System.out.println("[Server]Recieved Flop State");
+                                    System.out.println("[Server]Flop Cards" + tableCards);
+                                    objectOut.reset();
+                                    objectOut.writeObject(tableCards);
+                                    objectOut.flush();
+                                    System.out.println(currentButton);
+                                    
+                                    currentState = GameState.DEALDECISIONS;
+                                    nextState = GameState.TURN;
+                                }
+                            }else if(currentState == GameState.TURN){
+                                String request = in.readLine();
+                                if(request.equals("turnState")){
+                                    dealCards();
+                                    System.out.println("[Server]Recieved Turn State");
+                                    System.out.println("[Server] table turncards" + tableCards);
+                                    objectOut.reset();
                                     objectOut.writeObject(tableCards);
                                     objectOut.flush();
                                     System.out.println(currentButton);
                                     System.out.println("[Server has dealt the cards]");
-                                    nextState = GameState.DEALDECISIONS;
-                                    
+                                    currentState = GameState.DEALDECISIONS;
+                                    nextState = GameState.RIVER;
+                                }
+                            }else{
+                                String request = in.readLine();
+                                if(request.equals("riverState")){
+                                    System.out.println("[Server]Recieved river State");
+                                    dealCards();
+                                    System.out.println("[Server] table river cards" + tableCards);
+                                    objectOut.reset();
+                                    objectOut.writeObject(tableCards);
+                                    objectOut.flush();
+                                    System.out.println(currentButton);
+                                    System.out.println("[Server has dealt the cards]");
+                                    currentState = GameState.DEALDECISIONS;
+                                    nextState = GameState.DEAL;
                                 }
                             }
                         }
                         
                         
-                        currentState = nextState;
+//                        currentState = nextState;
                     }
                 }catch(Exception e){
                 
