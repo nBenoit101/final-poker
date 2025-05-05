@@ -77,27 +77,22 @@ public class Player {
                     objectIn = new ObjectInputStream(socket.getInputStream());
                     while(true){
                         if(messageToSend.equals("quit")){
+                            out.close();
+                            in.close();
+                            objectIn.close();
+                            socket.close();
                             break;
                         }
-                        if (currentState == GameState.DEAL) {
-                            out.println("dealState"); 
-                            System.out.println("[Client] sent out deal state");
-                            try {
-                                playerCards = (ArrayList<Card>) objectIn.readObject(); 
-                                System.out.println("[Player] Received cards: " + playerCards);
-                                SinglePlayerWin.getWindow().showInitialCards();
-                                out.println("cardsRecieved"); 
-                                System.out.println("[Client] sent out initail state");
-                                currentState = GameState.DEALDECISIONS;
-                                nextState = GameState.FLOP;
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                messageToSend = "donothing";
-                                System.out.println("[Client] did not reciee cards");
-                            }
-                        }else if(currentState == GameState.DEALDECISIONS){
+                        else if(currentState == GameState.DEALDECISIONS){
                             String serverMessage = in.readLine();
+                            
+                            if(serverMessage.startsWith("winner:")){
+                                handleWinnerMessage(serverMessage);
+                                currentState = GameState.DEAL;
+                                nextState = GameState.DEAL;
+                               
+                            }
+                            
                             if(serverMessage.equals("playersTurn")){
                                 SinglePlayerWin.getWindow().changeDealersChoice(serverMessage);
                                 SinglePlayerWin.getWindow().handleGui("check");
@@ -105,10 +100,7 @@ public class Player {
                             if(serverMessage.equals("check")){
                                 System.out.println("[Client]Recieved check");
                                 SinglePlayerWin.getWindow().changeDealersChoice(serverMessage);
-                                    if(hasPlayerGone){
-                                        SinglePlayerWin.getWindow().changeDealersChoice(serverMessage);
-                                    }else{
-                                        SinglePlayerWin.getWindow().changeDealersChoice(serverMessage);
+                                    if(!hasPlayerGone){
                                         SinglePlayerWin.getWindow().handleGui("check");
                                     }
                             }
@@ -116,58 +108,21 @@ public class Player {
                                 currentState = nextState;
                                 System.out.println("[Client]Recieved next state");
                             }
+                            if (serverMessage.equals("call")) {
+                                SinglePlayerWin.getWindow().changeDealersChoice("call");
+                                out.println("nextState");
+                                currentState = nextState;
+                                continue;
+                            }
                             out.println(messageToSend); 
                             
                         }else{
-                            if (currentState == GameState.FLOP){
-                                out.println("flopState");
-                                try {
-                                    tableCards = (ArrayList<Card>) objectIn.readObject(); 
-                                    System.out.println("[Player] Received Flop cards: " + tableCards);
-                                    SinglePlayerWin.getWindow().showFlopCards();
-                                    out.println("cardsRecieved"); 
-                                    System.out.println("[Client] sent out flop state");
-                                    currentState = GameState.DEALDECISIONS;
-                                    nextState = GameState.TURN;
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    messageToSend = "donothing";
-                                    System.out.println("[Client] did not reciee cards");
-                                }
-                            }else if(currentState == GameState.TURN){
-                                out.println("turnState");
-                                try {
-                                    tableCards = (ArrayList<Card>) objectIn.readObject(); 
-                                    System.out.println("[Player] Received turn cards: " + tableCards);
-                                    SinglePlayerWin.getWindow().showTurnCard();
-                                    out.println("cardsRecieved"); 
-                                    System.out.println("[Client] sent out turn state");
-                                    currentState = GameState.DEALDECISIONS;
-                                    nextState = GameState.RIVER;
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    messageToSend = "donothing";
-                                    System.out.println("[Client] did not reciee cards");
-                                }
-                            }else{
-                                out.println("riverState");
-                                try {
-                                    tableCards = (ArrayList<Card>) objectIn.readObject(); 
-                                    System.out.println("[Player] Received River cards: " + tableCards);
-                                    SinglePlayerWin.getWindow().showRiverCard();
-                                    out.println("cardsRecieved"); 
-                                    System.out.println("[Client] sent out river state");
-                                    currentState = GameState.DEALDECISIONS;
-                                    nextState = GameState.DEAL;
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    messageToSend = "donothing";
-                                    System.out.println("[Client] did not reciee cards");
-                                }
-                            }
-                            
+                            handleTableCardStates();
                         }
-                        messageToSend = "donothing";   
+                        synchronized(this){
+                            messageToSend = "donothing";   
+                        }    
+                       
                     }
 
                 }catch(Exception e){
@@ -179,17 +134,128 @@ public class Player {
         
     }
     
+    private void handleTableCardStates() {
+        try {
+            if (currentState == GameState.DEAL) {
+                resetGame();
+                SinglePlayerWin.getWindow().quitBtnState(true);
+                out.println("dealState"); 
+                System.out.println("[Client] sent out deal state");
+                try {
+                    playerCards = (ArrayList<Card>) objectIn.readObject(); 
+                    System.out.println("[Player] Received cards: " + playerCards);
+                    SinglePlayerWin.getWindow().showInitialCards();
+                    out.println("cardsRecieved"); 
+                    System.out.println("[Client] sent out initail state");
+                    currentState = GameState.DEALDECISIONS;
+                    nextState = GameState.FLOP;
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    messageToSend = "donothing";
+                    System.out.println("[Client] did not reciee cards");
+                }
+            } else if(currentState == GameState.FLOP) {
+                SinglePlayerWin.getWindow().quitBtnState(false);
+                hasPlayerGone = false;
+                out.println("flopState");
+                tableCards = (ArrayList<Card>) objectIn.readObject();
+                SinglePlayerWin.getWindow().showFlopCards();
+                out.println("cardsRecieved");
+                currentState = GameState.DEALDECISIONS;
+                nextState = GameState.TURN;
+
+            } else if (currentState == GameState.TURN) {
+                hasPlayerGone = false;
+                out.println("turnState");
+                tableCards = (ArrayList<Card>) objectIn.readObject();
+                SinglePlayerWin.getWindow().showTurnCard();
+                out.println("cardsRecieved");
+                currentState = GameState.DEALDECISIONS;
+                nextState = GameState.RIVER;
+
+            } else if (currentState == GameState.RIVER) {
+                hasPlayerGone = false;
+                out.println("riverState");
+                tableCards = (ArrayList<Card>) objectIn.readObject();
+                SinglePlayerWin.getWindow().showRiverCard();
+                out.println("cardsRecieved");
+                currentState = GameState.DEALDECISIONS;
+                nextState = GameState.DEAL;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            messageToSend = "donothing"; // recover from error
+        }
+    }
+    
+    
+    // Handles the message sent from the server
+    private void handleWinnerMessage(String message){
+        
+        //Refernecd from chatGPT to help parse data 
+        //Message is split into a list by the character :
+        String[] parts = message.split(":");
+        String result = parts[1];
+        int pot = parts.length > 2 ? Integer.parseInt(parts[2]) : 20;
+        
+        if(result.equals("player")){
+            changeBalance(pot);
+            SinglePlayerWin.getWindow().showPopup("You win the round");
+            
+        }else if (result.equals("dealer")){
+            SinglePlayerWin.getWindow().showPopup("Dealer wins the round");
+        }else{
+            changeBalance(pot / 2);
+            SinglePlayerWin.getWindow().showPopup("Tie Game");
+        }
+        
+        SinglePlayerWin.getWindow().updateBalanceText();
+    }
+    
+    
+    
+    private void resetGame(){
+        playerCards = new ArrayList();
+        dealerCards = new ArrayList();
+        SinglePlayerWin.getWindow().cardState(false);
+        messageToSend = "donothing";
+        hasPlayerGone = false;
+    }
+    
+    //PUBLIC METHODS
     
     //observer methods
     public void addObservers(Observer o){
        observer.add(o);
    }
     
+    //Ends Connection to Server
+    public void endConnection(){
+        try{
+            out.close();
+            in.close();
+            objectIn.close();
+            socket.close();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        
+    }
+
+    //Player Methods 
+    //Important methods Changes the field message to send
+    //This message is sent to the server depending on the players interaction with the gui
+    public void playerActions(String s){
+       synchronized(this){
+            messageToSend = s;
+       }
+    }
+    
     public void changeHasPlayerGone(boolean b){
         hasPlayerGone = b;
     }
     
-    //Player Methods 
     public String getName(){
         return name;
     }
@@ -207,18 +273,12 @@ public class Player {
     }
     
     public boolean changeBalance(int amount){
-        balance+= amount;
-        if(balance>0){
-            return  true;
-        }
+        balance += amount;
+        if (balance > 0){
+            return true;
+      }    
         balance = 0;
         return false;
-    }
-    
-    //Methods to send messages to server 
-    
-    public void playerActions(String s){
-        messageToSend = s;
     }
     
    

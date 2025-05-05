@@ -14,12 +14,13 @@ import javax.swing.JLabel;
  *
  * @author nickbenoit
  */
-public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
+public class SinglePlayerWin extends javax.swing.JFrame{
     private ArrayList<JLabel> playerCardsImg;
     private ArrayList<JLabel> dealerCardsImg;
     private ArrayList<JLabel> tableCardsImg;
+    private ArrayList<Observer> observers;
     
-    private SinglePlayerServer server;
+    
     private static SinglePlayerWin window;
     
     /**
@@ -27,10 +28,10 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
      */
     private SinglePlayerWin() {
         initComponents();
-        server = SinglePlayerServer.server();
         dealerCardsImg = new ArrayList();
         playerCardsImg = new ArrayList();
         tableCardsImg = new ArrayList();
+        observers = new ArrayList();
         initializeGui();
         disableGui();
         cardState(false);
@@ -62,6 +63,8 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
         balanceText = new javax.swing.JTextField();
         dealerInfo = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
+        foldBtn = new javax.swing.JButton();
+        quitBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -127,6 +130,20 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
 
         jLabel1.setText("Dealer:");
 
+        foldBtn.setText("Fold");
+        foldBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                foldBtnActionPerformed(evt);
+            }
+        });
+
+        quitBtn.setText("Quit");
+        quitBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                quitBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -135,8 +152,8 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(balanceText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(215, 215, 215)
+                        .addComponent(balanceText, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(165, 165, 165)
                         .addComponent(dealerCard1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(dealerCard2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -156,40 +173,47 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(dealerInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addGap(0, 368, Short.MAX_VALUE))
+                                .addComponent(dealerInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(foldBtn)
+                        .addGap(18, 18, 18)
+                        .addComponent(callBtn)
+                        .addGap(18, 18, 18)
+                        .addComponent(checkBtn)
+                        .addGap(224, 224, 224)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(quitBtn)
+                .addGap(19, 19, 19))
             .addGroup(layout.createSequentialGroup()
+                .addGap(294, 294, 294)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(54, 54, 54)
-                        .addComponent(callBtn)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(checkBtn)
-                        .addGap(49, 49, 49)
                         .addComponent(raiseSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(26, 26, 26)
+                        .addGap(39, 39, 39)
                         .addComponent(raiseAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(66, 66, 66)
+                        .addGap(18, 18, 18)
                         .addComponent(raiseBtn))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(294, 294, 294)
                         .addComponent(playerCard1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(playerCard2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(167, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(balanceText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(24, 24, 24)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(dealerCard1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(dealerCard2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(dealerCard2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(quitBtn)
+                            .addComponent(balanceText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(52, 52, 52)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(dealerInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -205,19 +229,15 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(playerCard1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(playerCard2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(35, 35, 35)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(callBtn)
-                            .addComponent(checkBtn)
-                            .addComponent(raiseSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(raiseAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(24, 24, 24))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(raiseBtn)
-                        .addGap(14, 14, 14))))
+                .addGap(35, 35, 35)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(callBtn)
+                    .addComponent(checkBtn)
+                    .addComponent(raiseSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(raiseAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(raiseBtn)
+                    .addComponent(foldBtn))
+                .addGap(24, 24, 24))
         );
 
         pack();
@@ -225,6 +245,9 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
 
     private void callBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_callBtnActionPerformed
         // TODO add your handling code here:
+        Player.getPlayer().changeHasPlayerGone(true);
+        Player.getPlayer().playerActions("call");
+        disableGui();
     }//GEN-LAST:event_callBtnActionPerformed
 
     private void checkBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBtnActionPerformed
@@ -238,6 +261,19 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
 
     private void raiseBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_raiseBtnActionPerformed
         // TODO add your handling code here:
+        if(Player.getPlayer().changeBalance(-raiseSlider.getValue())){
+            Player.getPlayer().changeHasPlayerGone(true);
+            int raiseAmount = raiseSlider.getValue();
+            Player.getPlayer().playerActions("raise:" + raiseAmount);
+            updateBalanceText();
+            notifyObservers();
+        }else{
+            showPopup("All In");
+            Player.getPlayer().playerActions("raise:" + Player.getPlayer().getBalance());
+            updateBalanceText();
+            notifyObservers();
+        }
+        disableGui();
     }//GEN-LAST:event_raiseBtnActionPerformed
 
     private void balanceTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_balanceTextActionPerformed
@@ -249,6 +285,24 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
         raiseAmount.setText("$ " + raiseSlider.getValue());
     }//GEN-LAST:event_raiseSliderStateChanged
 
+    private void foldBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foldBtnActionPerformed
+        // TODO add your handling code here:
+        Player.getPlayer().changeHasPlayerGone(true);
+        Player.getPlayer().playerActions("fold");
+        disableGui();
+    }//GEN-LAST:event_foldBtnActionPerformed
+
+    private void quitBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quitBtnActionPerformed
+        // TODO add your handling code here:
+        Player.getPlayer().endConnection();
+        this.setVisible(false);
+        disableGui();
+        cardState(false);
+       
+    }//GEN-LAST:event_quitBtnActionPerformed
+
+    
+    //PUBLIC METHODS
     public static SinglePlayerWin getWindow(){
         if(window==null){
             window = new SinglePlayerWin();
@@ -256,50 +310,35 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
         return window;
     }   
     
-    
-    @Override
-    public void updateData(){
-//        if(server.getCurrentState().getValue() == 0){
-//            showInitialCards();
-//        }else if(server.getCurrentState().getValue() == 1){
-//            showFlopCards();
-//        }else if(server.getCurrentState().getValue() == 2){
-//            showTurnCard();
-//        }else{
-//            showRiverCard();
-//        }
-        showInitialCards();
+    public void addObserver(Observer o){
+        observers.add(o);
     }
     
+    
+    public void quitBtnState(boolean b){
+        quitBtn.setVisible(b);
+    }
+    
+    
+    //Changes the TextField based on what's happening in the game
     public void changeDealersChoice(String t){
-        dealerInfo.setText("Dealer chooses to "+t);
+        if(t.equals("playersTurn")){
+            dealerInfo.setText(t);
+        }else{
+            dealerInfo.setText("Dealer chooses to "+t);
+        }
+        
     }
     
-    private void initializeGui(){
-        playerCardsImg.add(playerCard1);
-        playerCardsImg.add(playerCard2);
-        dealerCardsImg.add(dealerCard1);
-        dealerCardsImg.add(dealerCard2);
-        tableCardsImg.add(flopCard1);
-        tableCardsImg.add(flopCard2);
-        tableCardsImg.add(flopCard3);
-        tableCardsImg.add(turnCard);
-        tableCardsImg.add(riverCard);
-        updateBalanceText();
-        raiseAmount.setText("$ " + raiseSlider.getValue());
-    }
-    
-    public void disableButton(){
-        raiseBtn.setVisible(false);
-    }
-    public void disableSlider(){
-        raiseSlider.setVisible(false);
-    }
-    
-    private void updateBalanceText(){
+   
+    public void updateBalanceText(){
         balanceText.setText("Balance: " + Player.getPlayer().getBalance());
+        notifyObservers();
     }
     
+    
+    //Shows the dealers Cards
+    //Dealers Cards are just visualized as the back of a card
     public void showInitialCards(){
         for(int i = 0; i<playerCardsImg.size(); i++){
             try{
@@ -333,6 +372,8 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
         }        
     }
     
+    
+    //Shows the flop cards (First 3 table Cards)
     public void showFlopCards(){
        for(int i = 0; i<3; i++){
             try{
@@ -350,7 +391,8 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
             }
         }
     }
-        
+    
+    //Shows the turn Card (The last 4thxw card)
     public void showTurnCard(){
         try{
             ImageIcon tmp = new javax.swing.ImageIcon(
@@ -367,6 +409,7 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
         }
     }
     
+    //Shows the river Card (The last table card)
     public void showRiverCard(){
         try{
             ImageIcon tmp = new javax.swing.ImageIcon(
@@ -383,12 +426,19 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
         }
     }
     
+    public void showPopup(String message) {
+        javax.swing.JOptionPane.showMessageDialog(this, message, "Round Result", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    //Enables Certian Gui Elements depending on the string it recieves
     public void handleGui(String message){
         if (message.equals("check")){
             checkBtn.setEnabled(true);
             raiseSlider.setEnabled(true);
             raiseAmount.setEnabled(true);
             raiseBtn.setEnabled(true);
+            foldBtn.setEnabled(true);
+            foldBtn.setEnabled(true);
         }
         if(message.equals("raise")){
             callBtn.setEnabled(true);
@@ -398,16 +448,18 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
         }
     }
     
+    //Disables all GUI Buttons
     public void disableGui(){
         checkBtn.setEnabled(false);
         raiseSlider.setEnabled(false);
         raiseAmount.setEnabled(false);
         raiseBtn.setEnabled(false);
         callBtn.setEnabled(false);
+        foldBtn.setEnabled(false);
     }
     
-    
-    private void cardState(boolean b){
+    //Sets the Cards visibility to either true or false
+    public void cardState(boolean b){
         for(int i=0; i<2; i++){
             playerCardsImg.get(i).setVisible(b);
             dealerCardsImg.get(i).setVisible(b);
@@ -416,6 +468,36 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
             tableCardsImg.get(i).setVisible(b);
         }
     }
+    
+    //PRIVATE METHODS
+
+    //Tells Observers(HomeScreen to update players balance)
+    private void notifyObservers(){
+        for(int i=0; i<observers.size(); i++){
+            observers.get(i).updateData();
+        }
+    }
+
+    
+   //Adds the Card Labels to a list so they can be refernenced later
+    //Shows players balance
+    private void initializeGui(){
+        playerCardsImg.add(playerCard1);
+        playerCardsImg.add(playerCard2);
+        dealerCardsImg.add(dealerCard1);
+        dealerCardsImg.add(dealerCard2);
+        tableCardsImg.add(flopCard1);
+        tableCardsImg.add(flopCard2);
+        tableCardsImg.add(flopCard3);
+        tableCardsImg.add(turnCard);
+        tableCardsImg.add(riverCard);
+        updateBalanceText();
+        raiseAmount.setText("$ " + raiseSlider.getValue());
+    }
+    
+
+    
+    
     
     
 
@@ -429,9 +511,11 @@ public class SinglePlayerWin extends javax.swing.JFrame implements Observer {
     private javax.swing.JLabel flopCard1;
     private javax.swing.JLabel flopCard2;
     private javax.swing.JLabel flopCard3;
+    private javax.swing.JButton foldBtn;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel playerCard1;
     private javax.swing.JLabel playerCard2;
+    private javax.swing.JButton quitBtn;
     private javax.swing.JLabel raiseAmount;
     private javax.swing.JButton raiseBtn;
     private javax.swing.JSlider raiseSlider;

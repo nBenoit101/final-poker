@@ -4,13 +4,14 @@
  */
 package com.mycompany.finalpoker;
 
+import server.location.SinglePlayerServer;
 import javax.swing.JOptionPane;
 
 /**
  *
  * @author nickbenoit
  */
-public class HomeScreen extends javax.swing.JFrame {
+public class HomeScreen extends javax.swing.JFrame implements Observer {
 
     /**
      * Creates new form HomeScreen
@@ -24,7 +25,7 @@ public class HomeScreen extends javax.swing.JFrame {
         initComponents();
         setUpWin();
         window = SinglePlayerWin.getWindow();
-        p.addObservers(window);
+        window.addObserver(this);
         window.setVisible(false);
     }
     
@@ -33,7 +34,6 @@ public class HomeScreen extends javax.swing.JFrame {
     private void initComponents() {
 
         singlePBtn = new javax.swing.JButton();
-        multiPButton = new javax.swing.JButton();
         pokerLabel = new javax.swing.JTextField();
         userNameLabel = new javax.swing.JLabel();
         balanceLabel = new javax.swing.JLabel();
@@ -46,8 +46,6 @@ public class HomeScreen extends javax.swing.JFrame {
                 singlePBtnActionPerformed(evt);
             }
         });
-
-        multiPButton.setText("MultiPlayer");
 
         pokerLabel.setEditable(false);
         pokerLabel.setText("Poker");
@@ -65,12 +63,6 @@ public class HomeScreen extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(84, 84, 84)
-                .addComponent(singlePBtn)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(multiPButton)
-                .addGap(68, 68, 68))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(userNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -79,6 +71,10 @@ public class HomeScreen extends javax.swing.JFrame {
                 .addGap(198, 198, 198)
                 .addComponent(balanceLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(17, 17, 17))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(singlePBtn)
+                .addGap(260, 260, 260))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -89,20 +85,20 @@ public class HomeScreen extends javax.swing.JFrame {
                     .addComponent(userNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(balanceLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 281, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(singlePBtn)
-                    .addComponent(multiPButton))
+                .addComponent(singlePBtn)
                 .addGap(49, 49, 49))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    
+    public void updateData(){
+        balanceLabel.setText(p.getBalance() + " $");
+    }
     private void setUpWin(){
         String name = JOptionPane.showInputDialog(this, "Type Username");
         p = Player.getPlayer(name);
-        balanceLabel.setText(p.getBalance() + " $");
+        updateData();
         userNameLabel.setText(p.getName());
         isPlayerConnected = false;
         
@@ -115,11 +111,7 @@ public class HomeScreen extends javax.swing.JFrame {
     private void singlePBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_singlePBtnActionPerformed
         // TODO add your handling code here:
         window.setVisible(true);
-        SinglePlayerServer.server();
-        if(!isPlayerConnected){
-            Player.getPlayer().connectToGame();
-            isPlayerConnected = true;
-        }
+        Player.getPlayer().connectToGame();
         
     }//GEN-LAST:event_singlePBtnActionPerformed
 
@@ -157,7 +149,6 @@ public class HomeScreen extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel balanceLabel;
-    private javax.swing.JButton multiPButton;
     private javax.swing.JTextField pokerLabel;
     private javax.swing.JButton singlePBtn;
     private javax.swing.JLabel userNameLabel;

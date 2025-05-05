@@ -23,13 +23,6 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="84" max="-2" attributes="0"/>
-              <Component id="singlePBtn" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
-              <Component id="multiPButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="68" max="-2" attributes="0"/>
-          </Group>
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="userNameLabel" min="-2" pref="90" max="-2" attributes="0"/>
@@ -38,6 +31,11 @@
               <EmptySpace min="-2" pref="198" max="-2" attributes="0"/>
               <Component id="balanceLabel" min="-2" pref="75" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
+          </Group>
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace max="32767" attributes="0"/>
+              <Component id="singlePBtn" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="260" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -51,10 +49,7 @@
                   <Component id="balanceLabel" alignment="3" min="-2" pref="29" max="-2" attributes="0"/>
               </Group>
               <EmptySpace pref="281" max="32767" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="singlePBtn" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="multiPButton" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
+              <Component id="singlePBtn" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="49" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -68,11 +63,6 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="singlePBtnActionPerformed"/>
       </Events>
-    </Component>
-    <Component class="javax.swing.JButton" name="multiPButton">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="MultiPlayer"/>
-      </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="pokerLabel">
       <Properties>
